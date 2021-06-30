@@ -49,7 +49,7 @@ def parse():
         user_req_page = int(input("Введите количество страниц для парсинга: "))
         page_number = 1
         while page_number <= user_req_page:
-            html = get_html(URL, params = {'pageNumber': page_number})
+            html = get_html(URL, params = {'pageNumber': page_number})  # Целесообразнее даже будет формироваь URL по параметрам пользователя через словарь params
             result.extend(get_content(html.text))
             print(f"Парсинг страницы {page_number}")
             page_number += 1
