@@ -47,9 +47,11 @@ def parse():
     result = []
     if html.status_code == 200:
         user_req_page = int(input("Введите количество страниц для парсинга: "))
+        law_number = int(input("Введите номер закона(44 или 223): "))
         page_number = 1
         while page_number <= user_req_page:
-            html = get_html(URL, params = {'pageNumber': page_number})  # Целесообразнее даже будет формироваь URL по параметрам пользователя через словарь params
+            html = get_html(URL, params = {'pageNumber': page_number,
+                                           f'fz{law_number}': 'on'})  # Целесообразнее даже будет формироваь URL по параметрам пользователя через словарь params
             result.extend(get_content(html.text))
             print(f"Парсинг страницы {page_number}")
             page_number += 1
