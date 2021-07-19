@@ -84,6 +84,7 @@ def contract_docs_search(purchase_number, law_number):
                     'link': item.find('a').get('href'),
                     'contract_num': contract
                 })
+
     return res
 
 
@@ -99,8 +100,6 @@ def save_docs(dir_names, files, law_number, work_with_contracts = False):
                 os.mkdir(f"Purchase {dir_names}/{category}")
 
             if law_number == 'fz223':
-                # Ищем расширение файла в заголовках response по ссылке на скачивание,
-                # если его нет в названии или в title, что встречается только для 223 ФЗ
                 response = get_html(file['link'])
                 headers = response.headers
                 if "content-disposition" in headers and "filename" in headers["content-disposition"]:
@@ -133,9 +132,19 @@ def save_docs(dir_names, files, law_number, work_with_contracts = False):
             if not os.path.exists(f"Purchase {dir_names}/Contract {files['contract_num']}/{files['category']}"):
                 os.mkdir(f"Purchase {dir_names}/Contract {files['contract_num']}/{files['category']}")
             document = get_html(files['link']).content
-            name_of_file = files['name'].split(' ')  # Избавляемся от размера файла, указанного в названии
-            del name_of_file[-1]; del name_of_file[-1]
-            name_of_file = (' '.join(name_of_file))  # ... и собираем название файла обратно
+            name_of_file = files['name']  # Избавляемся от размера файла, указанного в названии
+            response = get_html(files['link'])
+            headers = response.headers
+            # в конце названий файлов есть их размер, чтобы все корректно открывалось, подставляю в конец расширение
+            if "content-disposition" in headers and "filename" in headers["content-disposition"]:
+                extension = '.' + \
+                            (re.match(r'.*filename=\"(.{1,})\".*', headers["content-disposition"]).group(1)).split(
+                                '.')[-1]
+                name_of_file += extension
+            # print(name_of_file.split('('))
+            # del name_of_file[-1]; del name_of_file[-1]
+            # name_of_file = (' '.join(name_of_file))  # ... и собираем название файла обратно
+            # print(name_of_file)
             print(f"Скачивается {name_of_file}")
             with open(f"Purchase {dir_names}/Contract {files['contract_num']}/{files['category']}/{name_of_file}", 'wb') as f:
                 f.write(document)
